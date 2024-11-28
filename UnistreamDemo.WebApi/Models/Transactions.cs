@@ -24,12 +24,4 @@
         public TransactionType Type { get; set; }
         public DateTime? RevertDateTime { get; set; }
     }
-
-    //public class DebitTransaction : ITransaction
-    //{
-    //    public Guid Id { get; }
-    //    public Guid ClientId { get; }
-    //    public DateTime DateTime { get; }
-    //    public decimal Amount { get; }
-    //}
 }

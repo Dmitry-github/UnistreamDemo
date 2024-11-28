@@ -2,7 +2,6 @@ namespace UnistreamDemo.WebApi
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.OpenApi.Models;
@@ -38,8 +37,6 @@ namespace UnistreamDemo.WebApi
                 });
             });
 
-            //services.AddSingleton<ILogger, Logger<ExceptionHandlingMiddleware>>();
-
             //FluentValidation
             services.AddScoped<IValidator<TransactionQuery>, TransactionQueryValidator>();
 
@@ -54,10 +51,7 @@ namespace UnistreamDemo.WebApi
             //services.AddSingleton<IClientRepository, ClientRepository>();                     //***Storage Emulation ONLY
             services.AddSingleton<IClientRepository>(_ => new ClientRepository(clientsSetup));  //***Storage Emulation With config data
 
-
             services.AddSingleton<ILogger, Logger<ProblemDetails>>();
-            //GetService<ILogger<ErrorDetails>>();
-            //services.AddSingleton(typeof(ILogger), logger);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,15 +74,6 @@ namespace UnistreamDemo.WebApi
 
             app.ConfigureExceptionHandler(logger);
 
-            //app.Map("api/Balance", builder => );
-
-            //static bool IsValid<T>(T obj, out ICollection<ValidationResult> results) where T : class
-            //{
-            //    var validationContext = new ValidationContext(obj);
-            //    results = new List<ValidationResult>();
-            //    return Validator.TryValidateObject(obj, validationContext, results, true);
-            //}
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -97,7 +82,6 @@ namespace UnistreamDemo.WebApi
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Test context writing"); });
                 endpoints.MapControllers();
             });
         }

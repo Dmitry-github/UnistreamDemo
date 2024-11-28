@@ -11,7 +11,6 @@
     {
         //non-readoly for Storage Emulation
 
-        //private ConcurrentBag<Transaction> _transactions = new ConcurrentBag<Transaction>();
         private IList<Transaction> _transactions = new List<Transaction>();
         private static readonly object _locker = new object();
 

@@ -30,13 +30,9 @@
 
         [HttpPost]
         public async Task<IActionResult> CreditAsync(TransactionQuery request, [FromServices] IValidator<TransactionQuery> validator) 
-            //  [FromServices] IValidator<TransactionQueryValidator> validator)
         {
-            //var validator = new TransactionQueryValidator();
-
             var requestValidationResult = await RequestValidationAsync(request, validator);
             if (requestValidationResult != null)
-                //return BadRequest(GetProblemDetails());
                 return requestValidationResult;
 
             var (validTransaction, text) = await _transactionService.TransactionIsValidAsync(request, TransactionType.Credit);
@@ -49,8 +45,6 @@
             var response = await _transactionService.CommitCreditAsync(request);
             return Ok(response);
 
-            //_logger.LogError(0, e, "Error while processing request from {Address}", Request.Path);
-            //return StatusCode(500);
         }
 
         [HttpPost]
@@ -84,12 +78,9 @@
                 return BadRequest(CreateProblemDetails("Unsuccessful transaction revert",
                     $"Invalid Transaction {id} revert: {text}"));
             }
-
-            //return Ok("RevertResponse");
         }
 
         [HttpGet]
-        //[Route("balance")]
         public async Task<IActionResult> BalanceAsync(Guid id)
         {
 
@@ -109,7 +100,6 @@
             {
                 var errorMessages = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage).ToArray());
                 return BadRequest(CreateProblemDetails("Validation error(s):", errorMessages));
-                //return BadRequest(validationResult.Errors);
             }
             return null;
         }

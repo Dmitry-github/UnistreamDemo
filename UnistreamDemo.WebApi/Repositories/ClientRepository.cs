@@ -3,15 +3,12 @@
     using Interfaces;
     using Models;
     using System;
-    using System.Collections.Concurrent;
     using System.Linq;
     using System.Collections.Generic;
     
     public class ClientRepository: IClientRepository
     {
         //non-readoly for Storage Emulation
-        
-        //private ConcurrentBag<Client> _clients = new ConcurrentBag<Client>();
         private IList<Client> _clients = new List<Client>();
         private static readonly object _locker = new object();
 
@@ -29,14 +26,6 @@
         {
             _clients = clients;
         }
-
-        //public IEnumerable<Client> GetAll()
-        //{
-        //    lock (_locker)
-        //    {
-        //        return _clients;
-        //    }
-        //}
 
         public Client Get(Guid clientId)
         {

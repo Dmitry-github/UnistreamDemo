@@ -1,8 +1,6 @@
 ﻿namespace UnistreamDemo.WebApi.Queries
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
     using Interfaces;
     using FluentValidation;
 
@@ -12,17 +10,10 @@
         
         public Guid ClientId { get; set; }
 
-        //public DateTime DateTime => DateTime.Now;
         public DateTime DateTime { get; set; }
 
         public decimal Amount { get; set; }
 
-        //public static bool IsValid<T>(T obj, out ICollection<ValidationResult> results) where T : class
-        //{
-        //    var validationContext = new ValidationContext(obj);
-        //    results = new List<ValidationResult>();
-        //    return Validator.TryValidateObject(obj, validationContext, results, true);
-        //}
     }
 
     public class TransactionQueryValidator : AbstractValidator<TransactionQuery>

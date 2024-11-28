@@ -1,9 +1,9 @@
-using Moq;
-using UnistreamDemo.WebApi.Interfaces;
-using UnistreamDemo.WebApi.Services;
-
 namespace UnistreamDemo.Tests
 {
+    using Moq;
+    using WebApi.Interfaces;
+    using WebApi.Services;
+
     public class TransactionServiceUnitTest
     {
         private readonly Mock<IClientRepository> _clientRepository;
@@ -36,8 +36,6 @@ namespace UnistreamDemo.Tests
         public void RevertNonExistingTransactionTest()
         {
             var transactionId = new Guid("00000000-0000-0000-0000-000000000001");
-
-            //_transactionRepository.Setup(tr => tr.GetTransaction(transactionId)).Returns(null);
 
             var transactionService = new TransactionService(_clientRepository.Object, _transactionRepository.Object);
 

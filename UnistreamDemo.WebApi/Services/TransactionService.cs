@@ -67,6 +67,9 @@
             
             if (existingTransaction != null)
             {
+                var clientBalance = _clientRepository.GetBalance(existingTransaction.Id);
+                if (clientBalance == null) return null;
+
                 transactionResponse = new TransactionResponse()
                 {
                     ClientBalance = (decimal)_clientRepository.GetBalance(existingTransaction.ClientId),
@@ -109,6 +112,9 @@
             if (existingTransaction?.ClientId != null)
             {
                 var currentBalance = (decimal)_clientRepository.GetBalance(existingTransaction.ClientId);
+                
+                //if (currentBalance == Decimal.MinusOne)
+                //    return (null, $"no balance for client {transactionId} found");
 
                 if (existingTransaction?.RevertDateTime != null)    //reverted previously. 
                 {
