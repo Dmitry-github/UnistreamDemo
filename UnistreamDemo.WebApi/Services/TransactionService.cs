@@ -67,12 +67,13 @@
             
             if (existingTransaction != null)
             {
-                var clientBalance = _clientRepository.GetBalance(existingTransaction.Id);
-                if (clientBalance == null) return null;
+                var clientBalance = _clientRepository.GetBalance(existingTransaction.ClientId) ?? Decimal.MinValue;
+                
+                if (clientBalance == decimal.MinValue) return null;
 
                 transactionResponse = new TransactionResponse()
                 {
-                    ClientBalance = (decimal)_clientRepository.GetBalance(existingTransaction.ClientId),
+                    ClientBalance = clientBalance,
                     InsertDateTime = existingTransaction.DateTime
                 };
                 return transactionResponse;
@@ -88,7 +89,10 @@
                     Type = transactionType
                 };
 
-                var currentBalance = (decimal)_clientRepository.GetBalance(transactionQuery.ClientId);
+                var currentBalance = _clientRepository.GetBalance(transactionQuery.ClientId) ?? Decimal.MinValue;
+                
+                if (currentBalance == decimal.MinValue) return null;
+
                 currentBalance += (int)transactionType * transactionQuery.Amount;
 
                 //TODO: check both success
@@ -111,10 +115,10 @@
 
             if (existingTransaction?.ClientId != null)
             {
-                var currentBalance = (decimal)_clientRepository.GetBalance(existingTransaction.ClientId);
-                
-                //if (currentBalance == Decimal.MinusOne)
-                //    return (null, $"no balance for client {transactionId} found");
+                var currentBalance = _clientRepository.GetBalance(existingTransaction.ClientId) ?? Decimal.MinValue;
+
+                if (currentBalance == Decimal.MinValue)
+                    return (null, $"no client {existingTransaction.ClientId} found");
 
                 if (existingTransaction?.RevertDateTime != null)    //reverted previously. 
                 {
