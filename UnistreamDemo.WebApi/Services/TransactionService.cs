@@ -20,34 +20,35 @@
 
         public async Task<(bool, string)> TransactionIsValidAsync(TransactionQuery transactionQuery, TransactionType transactionType)
         {
-            var currentBalance = await Task.Run(() => _clientRepository.GetBalance(transactionQuery.ClientId));
+            var currentBalance = await  _clientRepository.GetBalanceOrDefaultAsync(transactionQuery.ClientId);
             
             if (currentBalance == null) return (false, "(client id)");
 
-            var newBalance = (decimal) currentBalance + (int)transactionType * transactionQuery.Amount;
+            var newBalance = (decimal)currentBalance +
+                             Transaction.GetMultiplier(transactionType) * transactionQuery.Amount;
 
             return (newBalance > 0, "(balance)");
         }
 
         public async Task<TransactionResponse> CommitCreditAsync(TransactionQuery transactionQuery)
         {
-            return await Task.Run(() => CommitTransaction(transactionQuery, TransactionType.Credit));
+            return await CommitTransaction(transactionQuery, TransactionType.Credit);
         }
 
         public async Task<TransactionResponse> CommitDebitAsync(TransactionQuery transactionQuery)
         {
-            return await Task.Run(() => CommitTransaction(transactionQuery, TransactionType.Debit));
+            return await CommitTransaction(transactionQuery, TransactionType.Debit);
         }
 
         public async Task<(RevertResponse, string)> RevertAsync(Guid transactionId)
         {
-            return await Task.Run(() => RevertTransaction(transactionId));
+            return await RevertTransaction(transactionId);
         }
 
         public async Task<BalanceResponse> GetClientBalanceAsync(Guid clientId)
         {
 
-            var balance = await Task.Run(() => _clientRepository.GetBalance(clientId));
+            var balance = await _clientRepository.GetBalanceOrDefaultAsync(clientId);
 
             var balanceResponse = balance == null
                 ? null
@@ -60,14 +61,14 @@
             return balanceResponse;
         }
 
-        private TransactionResponse CommitTransaction(TransactionQuery transactionQuery, TransactionType transactionType)
+        private async Task<TransactionResponse> CommitTransaction(TransactionQuery transactionQuery, TransactionType transactionType)
         {
             TransactionResponse transactionResponse;
-            var existingTransaction = _transactionRepository.GetTransaction(transactionQuery.Id);
+            var existingTransaction = await _transactionRepository.GetTransactionAsync(transactionQuery.Id);
             
             if (existingTransaction != null)
             {
-                var clientBalance = _clientRepository.GetBalance(existingTransaction.ClientId) ?? Decimal.MinValue;
+                var clientBalance =  await _clientRepository.GetBalanceOrDefaultAsync(existingTransaction.ClientId) ?? Decimal.MinValue;
                 
                 if (clientBalance == decimal.MinValue) return null;
 
@@ -89,15 +90,15 @@
                     Type = transactionType
                 };
 
-                var currentBalance = _clientRepository.GetBalance(transactionQuery.ClientId) ?? Decimal.MinValue;
+                var currentBalance = await _clientRepository.GetBalanceOrDefaultAsync(transactionQuery.ClientId) ?? Decimal.MinValue;
                 
                 if (currentBalance == decimal.MinValue) return null;
 
-                currentBalance += (int)transactionType * transactionQuery.Amount;
+                currentBalance += Transaction.GetMultiplier(transactionType) * transactionQuery.Amount;
 
                 //TODO: check both success
-                _transactionRepository.AddTransaction(newTransaction);
-                _clientRepository.UpdateBalance(transactionQuery.ClientId, currentBalance);
+                await _transactionRepository.AddTransactionAsync(newTransaction);
+                await _clientRepository.UpdateBalanceAsync(transactionQuery.ClientId, currentBalance);
 
                 transactionResponse = new TransactionResponse()
                 {
@@ -109,13 +110,13 @@
             return transactionResponse;
         }
 
-        private (RevertResponse, string) RevertTransaction(Guid transactionId)
+        private async Task<(RevertResponse, string)> RevertTransaction(Guid transactionId)
         {
-            var existingTransaction = _transactionRepository.GetTransaction(transactionId);
+            var existingTransaction = await _transactionRepository.GetTransactionAsync(transactionId);
 
             if (existingTransaction?.ClientId != null)
             {
-                var currentBalance = _clientRepository.GetBalance(existingTransaction.ClientId) ?? Decimal.MinValue;
+                var currentBalance = await _clientRepository.GetBalanceOrDefaultAsync(existingTransaction.ClientId) ?? Decimal.MinValue;
 
                 if (currentBalance == Decimal.MinValue)
                     return (null, $"no client {existingTransaction.ClientId} found");
@@ -129,15 +130,16 @@
                         }, string.Empty);
                 }
 
-                var newBalance = currentBalance + -1 * (int)existingTransaction.Type * existingTransaction.Amount;
+                var newBalance = currentBalance + 
+                                 -1 * Transaction.GetMultiplier(existingTransaction.Type) * existingTransaction.Amount;
 
                 if (newBalance < 0) return (null, "No balance for revert");
 
-                var revertDateTime = _transactionRepository.RevertTransaction(transactionId);  //reverting  
+                var revertDateTime =await _transactionRepository.RevertTransactionAsync(transactionId);  //reverting  
 
                 if (revertDateTime != null) //just reverted 
                 {
-                    _clientRepository.UpdateBalance(existingTransaction.ClientId, newBalance);
+                    await _clientRepository.UpdateBalanceAsync(existingTransaction.ClientId, newBalance);
 
                     return (new RevertResponse()
                         { 

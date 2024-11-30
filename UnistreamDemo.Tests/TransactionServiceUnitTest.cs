@@ -20,7 +20,9 @@ namespace UnistreamDemo.Tests
         {
             var zeroBalanceClientId = new Guid("66775B21-2B0E-4569-BE90-05A603000000");
 
-            _clientRepository.Setup(cr => cr.GetBalance(zeroBalanceClientId)).Returns(0);
+            _clientRepository
+                .Setup(cr => cr.GetBalanceOrDefaultAsync(zeroBalanceClientId, CancellationToken.None).Result)
+                .Returns(0);
 
             var transactionService = new TransactionService(_clientRepository.Object, _transactionRepository.Object);
 

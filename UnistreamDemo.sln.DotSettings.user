@@ -4,7 +4,7 @@
     &lt;TestId&gt;xUnit::1C5433BE-2613-4FF1-A5BA-CFACEF01C278::net6.0::UnistreamDemo.Tests.TransactionServiceUnitTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f57d7417_002D6080_002D455c_002Dbd3e_002D0269bc13ae4b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TransactionServiceUnitTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f57d7417_002D6080_002D455c_002Dbd3e_002D0269bc13ae4b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="TransactionServiceUnitTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::1C5433BE-2613-4FF1-A5BA-CFACEF01C278::net6.0::UnistreamDemo.Tests.TransactionServiceUnitTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;

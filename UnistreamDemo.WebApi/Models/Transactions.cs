@@ -23,5 +23,18 @@
         public decimal Amount { get; set; }
         public TransactionType Type { get; set; }
         public DateTime? RevertDateTime { get; set; }
+
+        public static int GetMultiplier(TransactionType transactionType)
+        {
+            switch (transactionType)
+            {
+                case TransactionType.Debit:
+                    return -1;
+                case TransactionType.Credit:
+                    return 1;
+                default:
+                    throw new InvalidOperationException("Unknown transaction Type");
+            }
+        }
     }
 }

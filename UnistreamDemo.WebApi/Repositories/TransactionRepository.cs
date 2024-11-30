@@ -6,70 +6,46 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class TransactionRepository: ITransactionRepository
     {
         //non-readoly for Storage Emulation
 
-        private IList<Transaction> _transactions = new List<Transaction>();
-        private static readonly object _locker = new object();
+        private ConcurrentBag<Transaction> _transactions = new ConcurrentBag<Transaction>();
 
         public TransactionRepository() { }
         
-        public Transaction GetTransaction(Guid transactionId)
+        public async Task<Transaction> GetTransactionAsync(Guid transactionId)
         {
-            //return !_transactions.IsEmpty && _transactions.TryPeek(out var transaction) ? transaction : null;
-            lock (_locker)
-            {
-                return _transactions.FirstOrDefault(t => t.Id == transactionId);
-            }
+            return  _transactions.FirstOrDefault(t => t.Id == transactionId);
         }
 
-        public bool AddTransaction(Transaction transaction)
+        public async Task<bool> AddTransactionAsync(Transaction transaction)
         {
-            if (transaction != null)
-            {
-                lock (_locker)
-                {
-                    _transactions.Add(transaction);
-                    return true;
-                }
-            }
-            return false;
+            if (transaction == null) return false;
+            _transactions.Add(transaction);
+            return true;
         }
 
-        public Transaction DeleteTransaction(Guid transactionId)
+        public async Task<Transaction> DeleteTransactionAsync(Guid transactionId)
         {
-            lock (_locker)
-            {
-                if (_transactions.Count > 0)
-                {
-                    var transaction = _transactions.FirstOrDefault(t => t.Id == transactionId);
-                    _transactions.Remove(transaction); 
-                    return transaction;
-                }
-            }
-
-            return null;
+            return !_transactions.IsEmpty && _transactions.TryTake(out var transaction) ? transaction : null;
         }
 
-        public DateTime? RevertTransaction(Guid transactionId)
+        public async Task<DateTime?> RevertTransactionAsync(Guid transactionId)
         {
-            lock (_locker)
+            if (_transactions.Count > 0)
             {
-                if (_transactions.Count > 0)
+                var transaction =
+                    _transactions.FirstOrDefault(t => t.Id == transactionId && t.RevertDateTime == null);
+
+                if (transaction != null)
                 {
-                    var transaction =
-                        _transactions.FirstOrDefault(t => t.Id == transactionId && t.RevertDateTime == null);
-                    
-                    if (transaction != null)
-                    {
-                        transaction.RevertDateTime = DateTime.Now;
-                        return transaction.RevertDateTime;
-                    }
+                    transaction.RevertDateTime = DateTime.Now;
+                    return transaction.RevertDateTime;
                 }
             }
-
             return null;
         }
     }

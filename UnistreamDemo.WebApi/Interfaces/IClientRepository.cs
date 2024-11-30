@@ -2,11 +2,13 @@
 {
     using Models;
     using System;
+    using System.Threading.Tasks;
+    using System.Threading;
 
     public interface IClientRepository
     {
-        Client Get(Guid clientId);
-        public decimal? GetBalance(Guid clientId);
-        public bool UpdateBalance(Guid clientId, decimal balance);
+        Task<Client> GetAsync(Guid clientId, CancellationToken cancellationToken = default);
+        Task<decimal?> GetBalanceOrDefaultAsync(Guid clientId, CancellationToken cancellationToken = default);
+        Task<bool> UpdateBalanceAsync(Guid clientId, decimal balance, CancellationToken cancellationToken = default);
     }
 }

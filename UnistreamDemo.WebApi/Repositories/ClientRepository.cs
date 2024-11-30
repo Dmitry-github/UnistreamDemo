@@ -5,13 +5,16 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
-    
+    using System.Collections.Concurrent;
+    using System.Threading.Tasks;
+    using System.Threading;
+
     public class ClientRepository: IClientRepository
     {
         //non-readoly for Storage Emulation
-        private IList<Client> _clients = new List<Client>();
-        private static readonly object _locker = new object();
 
+        private ConcurrentBag<Client> _clients = new ConcurrentBag<Client>();
+        
         /*
         public ClientRepository()
         {
@@ -24,36 +27,30 @@
 
         public ClientRepository(IList<Client> clients)
         {
-            _clients = clients;
+            //_clients = clients;
+            _clients = new ConcurrentBag<Client>(clients);
         }
 
-        public Client Get(Guid clientId)
+        public async Task<Client> GetAsync(Guid clientId, CancellationToken cancellationToken = default)
         {
-            lock (_locker)
-            {
-                return _clients.FirstOrDefault(c => c.Id == clientId);
-            }
+            return _clients.FirstOrDefault(c => c.Id == clientId);
         }
 
-        public decimal? GetBalance(Guid clientId)
+        public async Task<decimal?> GetBalanceOrDefaultAsync(Guid clientId, CancellationToken cancellationToken = default)
         {
-            lock (_locker)
-            {
-                return Get(clientId)?.Balance;
-            }
+            var client = await GetAsync(clientId, cancellationToken);
+            return client?.Balance;
         }
 
-        public bool UpdateBalance(Guid clientId, decimal balance)
+        public async Task<bool> UpdateBalanceAsync(Guid clientId, decimal balance, CancellationToken cancellationToken = default)
         {
-            lock (_locker)
+            if (_clients.Count > 0)
             {
-                if (_clients.Count > 0)
-                {
-                    var client = _clients.FirstOrDefault(c => c.Id == clientId);
-                    if (client != null) client.Balance = balance;
-                    return true;
-                }
+                var client = _clients.FirstOrDefault(c => c.Id == clientId);
+                if (client != null) client.Balance = balance;
+                return true;
             }
+
             return false;
         }
     }

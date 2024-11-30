@@ -3,10 +3,7 @@
     using System;
     using System.Linq;
     using System.Net;
-    using System.Text.Json;
     using System.Threading.Tasks;
-    using System.Collections.Generic;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Interfaces;
@@ -15,7 +12,6 @@
     using FluentValidation;
 
     [Route("api/[action]")]
-    //[Route("api/[controller]/[action]")]
     [ApiController]
     public class TransactionController : ControllerBase
     {
